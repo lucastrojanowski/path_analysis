@@ -2,6 +2,46 @@ import numpy as np, sys, time, inspect, os, pickle
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
+def plot_relative_residuals(xdata, ydata, err, fit, savepath=None):
+    """
+    Calculate the residuals between the function and the data.
+
+    Parameters:
+    xdata (array-like): The x data.
+    ydata (array-like): The y data.
+    err (array-like): Error on data.
+    fit (array-like): Fit to data evaluated at xdata
+    savepath (str, optional): Path to which to save residuals plot
+
+    Returns:
+    Plots data and saves figure to savepath
+    residuals (array-like): The residuals of the function and the data.
+
+    """
+    # Calculate the function values with the given parameters
+
+    
+    # Calculate the residuals
+    residuals = np.abs((ydata - fit)/err)
+    fig, axs = plt.subplots(2, 1, figsize=(5,5),height_ratios=[4,1],sharex=True)
+    axs[0].errorbar(xdata, ydata, err, color='black', alpha=0.5, markersize=1,marker='o', capsize=1, label='Data',linestyle='None')
+    axs[0].plot(xdata, fit, color='red', label='Fit')
+    axs[0].set_ylim(5e-4,2)
+    axs[0].set_yscale('log')
+    axs[0].set_ylabel('S(q,ω)/S(q,0)')
+    axs[1].set_xlabel('ω (1/ps)')
+    axs[1].scatter(xdata,residuals, color='black', label='Residual',s=2)
+    #axs[1].axhline(0,color='grey',linestyle='--',alpha=0.5)
+    axs[1].axhline(1,color='grey',linestyle='--',alpha=0.5)
+    axs[1].set_ylabel('Rel Res')
+    axs[1].set_ylim(-1,3)
+    plt.tight_layout()
+
+    if savepath is not None:
+        plt.savefig(savepath, bbox_inches='tight')
+    plt.show()
+    
+    return residuals
 def create_subregion_queue_from_location(x, y, z, lx, ly, lz, rc, Nboxes=10):
     dx = lx/Nboxes; dy = ly/Nboxes; dz = lz/Nboxes
     
